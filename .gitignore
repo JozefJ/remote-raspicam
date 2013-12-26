@@ -1,0 +1,8 @@
+#Metainfo files
+/.*
+.*
+*~
+!.gitignore
+
+#Binaries
+target/
