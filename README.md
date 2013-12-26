@@ -1,0 +1,1 @@
+This project provide a REST API to control the Raspberry Pi Camera Board to record videos.
