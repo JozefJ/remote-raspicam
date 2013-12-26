@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+                           http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+                           http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd">
+
+    <import resource="classpath:META-INF/cxf/cxf.xml" />
+
+    <!-- JAX-RS -->
+    <jaxrs:server id="camera" address="http://localhost:8080/camera" depends-on="port-8080-config">
+        <jaxrs:serviceBeans>
+            <ref bean="cameraService" />
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider"/>
+            <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+    <bean id="cameraService" class="es.anloci.raspberry.camera.rest.server.CameraServiceImpl" />
+
+    <httpj:engine-factory bus="cxf" id="port-8080-config">
+        <httpj:engine port="8080">
+            <httpj:threadingParameters minThreads="5" maxThreads="15" />
+            <httpj:connector>
+                <bean class="org.eclipse.jetty.server.bio.SocketConnector">
+                    <property name="port" value="8080" />
+                </bean>
+            </httpj:connector>
+            <httpj:handlers>
+                <bean class="org.eclipse.jetty.server.handler.DefaultHandler" />
+            </httpj:handlers>
+            <httpj:sessionSupport>true</httpj:sessionSupport>
+        </httpj:engine>
+    </httpj:engine-factory>
+<!-- <bean id="Server" class="org.eclipse.jetty.server.Server" -->
+<!--     init-method="start" destroy-method="stop"> -->
+
+<!--     <property name="connectors"> -->
+<!--         <list> -->
+<!--             <bean id="Connector" class="org.eclipse.jetty.server.nio.SelectChannelConnector"> -->
+<!--                 <property name="port" value="8080" /> -->
+<!--             </bean> -->
+<!--         </list> -->
+<!--     </property> -->
+
+<!--     <property name="handler"> -->
+<!--         <bean id="handlers" class="org.eclipse.jetty.server.handler.HandlerList"> -->
+<!--             <property name="handlers"> -->
+<!--                 <list> -->
+<!--                     <bean class="org.eclipse.jetty.server.handler.ResourceHandler"> -->
+<!--                         <property name="directoriesListed" value="true" /> -->
+<!--                         <property name="welcomeFiles"> -->
+<!--                             <list> -->
+<!--                                 <value>index.html</value> -->
+<!--                             </list> -->
+<!--                         </property> -->
+<!--                         <property name="resourceBase" value="./someDir" /> -->
+<!--                     </bean> -->
+<!--                     <ref bean="web-service-cxf" /> -->
+<!--                     <bean class="org.eclipse.jetty.server.handler.DefaultHandler" /> -->
+<!--                 </list> -->
+<!--             </property> -->
+<!--         </bean> -->
+<!--     </property> -->
+<!-- </bean> -->
+
+
+
+<!-- <bean name="web-service-cxf" class="org.eclipse.jetty.servlet.ServletContextHandler"> -->
+<!--     <property name="contextPath" value="/camera" /> -->
+<!--     <property name="handler"> -->
+<!--         <bean class="org.eclipse.jetty.servlet.ServletHandler"> -->
+<!--             <property name="servlets"> -->
+<!--                 <list> -->
+<!--                     <bean class="org.eclipse.jetty.servlet.ServletHolder"> -->
+<!--                         <property name="name" value="cxf-servlet-holder" /> -->
+<!--                         <property name="servlet"> -->
+<!--                             <bean class="org.apache.cxf.transport.servlet.CXFServlet"> -->
+<!--                             </bean> -->
+<!--                         </property> -->
+<!--                     </bean> -->
+<!--                 </list> -->
+<!--             </property> -->
+<!--             <property name="servletMappings"> -->
+<!--                 <list> -->
+<!--                     <bean class="org.eclipse.jetty.servlet.ServletMapping"> -->
+<!--                         <property name="servletName" value="cxf-servlet-holder" /> -->
+<!--                         <property name="pathSpec" value="/*" /> -->
+<!--                     </bean> -->
+<!--                 </list> -->
+<!--             </property> -->
+<!--         </bean> -->
+<!--     </property> -->
+<!-- </bean> -->
+</beans>

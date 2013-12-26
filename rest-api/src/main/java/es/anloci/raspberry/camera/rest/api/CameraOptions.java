@@ -440,7 +440,7 @@ public class CameraOptions {
             builder.add("--framerate");
             builder.add(this.framerate.toString());
         }
-        if (this.framerate != null) {
+        if (this.intra != null) {
             builder.add("--intra");
             builder.add(this.intra.toString());
         }
