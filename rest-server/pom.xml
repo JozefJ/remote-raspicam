@@ -14,6 +14,7 @@
         <cxf.version>2.7.0</cxf.version>
         <sping.version>3.1.1.RELEASE</sping.version>
         <jettison.version>1.3.4</jettison.version>
+        <assembly-maven-plugin>2.4</assembly-maven-plugin>
     </properties>
 
     <dependencies>
@@ -58,4 +59,58 @@
             <version>${jettison.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- <plugin> -->
+            <!-- <groupId>org.apache.maven.plugins</groupId> -->
+            <!-- <artifactId>maven-assembly-plugin</artifactId> -->
+            <!-- <version>${assembly-maven-plugin}</version> -->
+            <!-- <configuration> -->
+            <!-- <descriptorRefs> -->
+            <!-- <descriptorRef>jar-with-dependencies</descriptorRef> -->
+            <!-- </descriptorRefs> -->
+            <!-- <archive> -->
+            <!-- <manifest> -->
+            <!-- <mainClass>es.anloci.raspberry.camera.rest.server.Main</mainClass> -->
+            <!-- </manifest> -->
+            <!-- </archive> -->
+            <!-- </configuration> -->
+            <!-- <executions> -->
+            <!-- <execution> -->
+            <!-- <id>assemble-all</id> -->
+            <!-- <phase>package</phase> -->
+            <!-- <goals> -->
+            <!-- <goal>single</goal> -->
+            <!-- </goals> -->
+            <!-- </execution> -->
+            <!-- </executions> -->
+            <!-- </plugin> -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <version>1.7</version>
+                <configuration>
+                    <programs>
+                        <program>
+                            <mainClass>es.anloci.raspberry.camera.rest.server.Main</mainClass>
+                            <id>start</id>
+                        </program>
+                    </programs>
+                    <assembleDirectory>${project.build.directory}/${project.parent.artifactId}</assembleDirectory>
+                    <repositoryLayout>flat</repositoryLayout>
+                    <useWildcardClassPath>true</useWildcardClassPath>
+                    <repositoryName>lib</repositoryName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

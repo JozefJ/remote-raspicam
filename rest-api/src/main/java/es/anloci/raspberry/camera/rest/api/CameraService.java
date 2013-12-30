@@ -3,6 +3,7 @@ package es.anloci.raspberry.camera.rest.api;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 
 /**
@@ -13,10 +14,11 @@ import javax.ws.rs.WebApplicationException;
 public interface CameraService {
     @Path("/stop")
     @POST
-    void stop();
+    void stopVideo();
     
-    @Path("/start")
+    @Path("/record")
     @POST
     @Consumes({"application/xml", "application/json"})
-    StreamURL start(CameraOptions options) throws WebApplicationException;
+    @Produces({"application/xml", "application/json"})
+    StreamURL recordVideo(CameraOptions options) throws WebApplicationException;
 }

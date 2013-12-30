@@ -16,6 +16,9 @@ public class StreamURL {
     @XmlElement
     private String url = null;
 
+    public StreamURL() {
+    }
+
     public StreamURL(String url) {
         this.url = url;
     }

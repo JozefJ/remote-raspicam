@@ -18,7 +18,7 @@ public class CameraServiceImpl implements CameraService {
         this.host = InetAddress.getLocalHost().getHostAddress();
     }
     
-    public synchronized void stop() {
+    public synchronized void stopVideo() {
         if (CameraServiceImpl.process != null) {
             try {
                 CameraServiceImpl.process.exitValue();
@@ -30,7 +30,7 @@ public class CameraServiceImpl implements CameraService {
         }
     }
 
-    public synchronized StreamURL start(CameraOptions options) throws WebApplicationException {        
+    public synchronized StreamURL recordVideo(CameraOptions options) throws WebApplicationException {        
         if (CameraServiceImpl.process != null) {
             WebApplicationException ex = new WebApplicationException(500);
             throw ex;
@@ -38,7 +38,9 @@ public class CameraServiceImpl implements CameraService {
         String raspividCmd = createRaspividCommand(options);
         String vlcCmd = createVLCCommand(options);
         try {
-            CameraServiceImpl.process = Runtime.getRuntime().exec(raspividCmd + ((vlcCmd == null) ? "" : " | " +  vlcCmd));
+            String cmd = raspividCmd + ((vlcCmd == null) ? "" : " | " +  vlcCmd);
+            System.out.println(cmd);
+            CameraServiceImpl.process = Runtime.getRuntime().exec(cmd);
             return (vlcCmd == null) ? null : new StreamURL("http://" + this.host +":" + options.getPort() + "/");
         } catch (IOException e) {
             WebApplicationException ex = new WebApplicationException(500);
