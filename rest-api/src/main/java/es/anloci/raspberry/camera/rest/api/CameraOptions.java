@@ -1,6 +1,8 @@
 package es.anloci.raspberry.camera.rest.api;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.Max;
@@ -28,6 +30,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "options")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CameraOptions {
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("YYMMddHHmmss");
+
+    public enum ISO {
+        ISO100(100), ISO200(200), ISO400(400), ISO800(800);
+        
+        private int iso;
+        
+        private ISO(int iso) {
+            this.iso = iso;
+        }
+        
+        public String toString(){
+            return Integer.toString(this.iso);
+        }
+    }
+
     public enum Profile {
         BASELINE("baseline"), MAIN("main"), HIGH("high");
 
@@ -142,7 +160,7 @@ public class CameraOptions {
      * Stream port
      */
     @XmlElement
-    private Integer port = 8554;
+    private Integer port = null;
 
     /**
      * -fps, --framerate : Specify the frames per second to record
@@ -156,25 +174,25 @@ public class CameraOptions {
     @XmlElement
     private Integer intra = null;
  
-    /**
-     * -pf, --profile : Specify H264 profile to use for encoding
-     */
-    @XmlElement
-    private Profile profile = null;
-  
-    /**
-     * -qp, --qp : Quantisation parameter. Use approximately 10-40. Default 0 (off)
-     */
-    @XmlElement(defaultValue = "0")
-    @Min(0)
-    private int quantisation = 0;
-  
-    /**
-     * -ih, --inline : Insert inline headers (SPS, PPS) to stream
-     */
-    @XmlElement
-    private String inline = null;
- 
+//    /**
+//     * -pf, --profile : Specify H264 profile to use for encoding
+//     */
+//    @XmlElement
+//    private Profile profile = null;
+//  
+//    /**
+//     * -qp, --qp : Quantisation parameter. Use approximately 10-40. Default 0 (off)
+//     */
+//    @XmlElement(defaultValue = "0")
+//    @Min(0)
+//    private int quantisation = 0;
+//  
+//    /**
+//     * -ih, --inline : Insert inline headers (SPS, PPS) to stream
+//     */
+//    @XmlElement
+//    private String inline = null;
+// 
     /**
      * -sh, --sharpness : Set image sharpness (-100 to 100)
      */
@@ -208,7 +226,7 @@ public class CameraOptions {
      * -ISO, --ISO       : Set capture ISO
      */
     @XmlElement
-    private Boolean iso = null;
+    private ISO iso = null;
 
     /**
      * -vs, --vstab      : Turn on video stablisation
@@ -273,7 +291,7 @@ public class CameraOptions {
     }
 
     public String getFile() {
-        return file;
+        return this.file.replaceAll("%d", SDF.format(new Date()));
     }
 
     public void setFile(String file) {
@@ -312,29 +330,29 @@ public class CameraOptions {
         this.intra = intra;
     }
 
-    public Profile getProfile() {
-        return profile;
-    }
-
-    public void setProfile(Profile profile) {
-        this.profile = profile;
-    }
-
-    public int getQuantisation() {
-        return quantisation;
-    }
-
-    public void setQuantisation(int quantisation) {
-        this.quantisation = quantisation;
-    }
-
-    public String getInline() {
-        return inline;
-    }
-
-    public void setInline(String inline) {
-        this.inline = inline;
-    }
+//    public Profile getProfile() {
+//        return profile;
+//    }
+//
+//    public void setProfile(Profile profile) {
+//        this.profile = profile;
+//    }
+//
+//    public int getQuantisation() {
+//        return quantisation;
+//    }
+//
+//    public void setQuantisation(int quantisation) {
+//        this.quantisation = quantisation;
+//    }
+//
+//    public String getInline() {
+//        return inline;
+//    }
+//
+//    public void setInline(String inline) {
+//        this.inline = inline;
+//    }
 
     public Integer getSharpness() {
         return sharpness;
@@ -368,11 +386,11 @@ public class CameraOptions {
         this.saturation = saturation;
     }
 
-    public boolean isISO() {
-        return iso != null && iso;
+    public ISO isISO() {
+        return iso;
     }
 
-    public void setISO(Boolean iso) {
+    public void setISO(ISO iso) {
         this.iso = iso;
     }
 
@@ -444,16 +462,16 @@ public class CameraOptions {
             builder.add("--intra");
             builder.add(this.intra.toString());
         }
-        if (this.profile != null) {
-            builder.add("--profile");
-            builder.add(this.profile.toString());
-        }
-        builder.add("--quantisation");
-        builder.add(Integer.toString(this.quantisation));
-        if (this.inline != null) {
-            builder.add("--inline");
-            builder.add(this.inline);
-        }
+//        if (this.profile != null) {
+//            builder.add("--profile");
+//            builder.add(this.profile.toString());
+//        }
+//        builder.add("--quantisation");
+//        builder.add(Integer.toString(this.quantisation));
+//        if (this.inline != null) {
+//            builder.add("--inline");
+//            builder.add(this.inline);
+//        }
         
         if (this.sharpness != null) {
             builder.add("--sharpness");
@@ -471,8 +489,9 @@ public class CameraOptions {
             builder.add("--saturation");
             builder.add(this.saturation.toString());
         }
-        if (this.iso != null && this.iso) {
+        if (this.iso != null) {
             builder.add("--ISO");
+            builder.add(this.iso.toString());
         }
         if (this.stablisation != null && this.stablisation) {
             builder.add("--vstab");
@@ -495,6 +514,13 @@ public class CameraOptions {
         }
         builder.add("--rotation");
         builder.add(Integer.toString(this.rotation));
+        
+        builder.add("--output");
+        if (this.file != null && this.port == null) {
+            builder.add(this.getFile());
+        } else {
+            builder.add("-");
+        }
         return builder.toArray(new String[0]);
     }
 

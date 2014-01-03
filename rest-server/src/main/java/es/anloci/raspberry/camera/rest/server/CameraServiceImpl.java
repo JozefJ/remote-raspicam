@@ -2,9 +2,22 @@ package es.anloci.raspberry.camera.rest.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 
 import javax.ws.rs.WebApplicationException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.cxf.helpers.IOUtils;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.mapped.Configuration;
+import org.codehaus.jettison.mapped.MappedNamespaceConvention;
+import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 
 import es.anloci.raspberry.camera.rest.api.CameraOptions;
 import es.anloci.raspberry.camera.rest.api.CameraService;
@@ -16,6 +29,29 @@ public class CameraServiceImpl implements CameraService {
     
     public CameraServiceImpl() throws UnknownHostException {
         this.host = InetAddress.getLocalHost().getHostAddress();
+        init();
+    }
+
+    private void init() {
+        URL url = this.getClass().getClassLoader().getResource("init.json");
+        if (url != null) {
+            try {
+                JAXBContext jc = JAXBContext.newInstance(CameraOptions.class);
+
+                JSONObject obj = new JSONObject(IOUtils.toString(url.openStream()));
+                Configuration config = new Configuration();
+                MappedNamespaceConvention con = new MappedNamespaceConvention(config);
+                XMLStreamReader xmlStreamReader = new MappedXMLStreamReader(obj, con);
+
+                Unmarshaller unmarshaller = jc.createUnmarshaller();
+                CameraOptions options = (CameraOptions) unmarshaller.unmarshal(xmlStreamReader);
+                recordVideo(options);
+            } catch (JSONException e) {
+            } catch (IOException e) {
+            } catch (XMLStreamException e) {
+            } catch (JAXBException e) {
+            }
+        }
     }
     
     public synchronized void stopVideo() {
@@ -52,7 +88,7 @@ public class CameraServiceImpl implements CameraService {
     private String createVLCCommand(CameraOptions options) {
         String file = options.getFile();
         Integer port = options.getPort();
-        if (file == null && port == null) {
+        if (port == null) {
             return null;
         }
         StringBuilder builder = new StringBuilder();
